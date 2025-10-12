@@ -1,6 +1,6 @@
 # TARGET--SQLPORTFOLIOPROJECT
 This is a project that I followed from a youtube channel where I learned more about how to do data analysis
-
+\n
 -- Import the dataset and do usual exploratory analysis steps like checking the
 -- structure & characteristics of the dataset:
 -- 1. Data type of all columns in the "customers" table.
