@@ -52,3 +52,20 @@ COUNT(order_id) as order_num FROM `TARGET_SQL.orders`
 GROUP BY EXTRACT(hour from order_purchase_timestamp)
 ORDER BY order_num desc;
 -- Brazilians mostly buy in Afternoon and Mornings
+
+-- 3. Evolution of E-commerce orders in the Brazil region:
+-- 1. Get the month on month no. of orders placed in each state.
+
+
+SELECT  EXTRACT(MONTH from order_purchase_timestamp)as month,
+EXTRACT(YEAR from order_purchase_timestamp) as year,
+COUNT(*) as num_orders,
+ FROM `TARGET_SQL.orders`
+ GROUP BY year,month
+ ORDER BY year,month;
+-- 2. How are the customers distributed across all the states?
+
+SELECT customer_city,customer_state, 
+COUNT(DISTINCT customer_id) as customer_count FROM `TARGET_SQL.customers`
+GROUP BY customer_city,customer_state
+ORDER BY customer_city,customer_count DESC;
