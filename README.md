@@ -69,3 +69,38 @@ SELECT customer_city,customer_state,
 COUNT(DISTINCT customer_id) as customer_count FROM `TARGET_SQL.customers`
 GROUP BY customer_city,customer_state
 ORDER BY customer_city,customer_count DESC;
+
+-- 4. Impact on Economy: Analyze the money movement by e-commerce by looking
+-- at order prices, freight and others.
+-- 1. Get the % increase in the cost of orders from year 2017 to 2018
+-- (include months between Jan to Aug only).
+-- You can use the "payment_value" column in the payments table to get
+-- the cost of orders.
+With yearly_totals as (
+SELECT EXTRACT(YEAR from o.order_purchase_timestamp) as year,
+SUM(p.payment_value) as total_payment
+ FROM `TARGET_SQL.payments` as p
+  JOIN `TARGET_SQL.orders` as o
+  ON p.order_id=o.order_id
+  WHERE EXTRACT(YEAR from o.order_purchase_timestamp) in (2017,2018)
+  AND EXTRACT(MONTH from o.order_purchase_timestamp) between 1 and 8
+  GROUP BY EXTRACT(YEAR from o.order_purchase_timestamp)
+),
+yearly_comparisons AS (
+SELECT year, total_payment, LEAD(total_payment) over (order by year desc) prev_year_payment
+from yearly_totals
+)
+SELECT ROUND(((total_payment - prev_year_payment)/prev_year_payment) *100) FROM yearly_comparisons;
+-- 2. Calculate the Total & Average value of order price for each state.
+-- 3. Calculate the Total & Average value of order freight for each state.
+SELECT c.customer_state,
+AVG(price) as avg_price,
+SUM(price) as sum_price,
+AVG(freight_value) as avg_freight,
+SUM(freight_value) as sum_freight
+FROM `TARGET_SQL.orders` as o
+JOIN `TARGET_SQL.order_items` as oi
+ON o.order_id = oi.order_id
+JOIN `TARGET_SQL.customers` as c
+ON o.customer_id = c.customer_id
+GROUP BY c.customer_state;
